@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Teacher Dashboard · New HSK Course 1</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230e7a4f'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E师%3C/text%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    :root{ --heat: 14,122,79; }
+    body.dark{ --heat: 61,220,151; }
+
+    .wrap{max-width:1280px;margin:0 auto;padding:26px 18px 70px}
+    .topbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+    .topbar .grow{flex:1}
+    .ctrl{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .ctrl input,.ctrl select{
+      padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);
+      color:var(--ink);font:600 14px var(--ui);outline:none}
+    .ctrl input:focus,.ctrl select:focus{border-color:var(--acc)}
+    .ctrl input[type=password]{letter-spacing:4px;width:150px}
+    .ctrl input[type=search]{width:190px}
+    label.ck{display:flex;gap:6px;align-items:center;font:600 13px var(--ui);color:var(--muted);cursor:pointer}
+
+    /* ---- tabs ---- */
+    .views{display:flex;gap:8px;margin:14px 0 14px;flex-wrap:wrap}
+    .views .pill{padding:9px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);
+      color:var(--muted);font:700 13px var(--ui);cursor:pointer;transition:.18s}
+    .views .pill:hover{border-color:var(--acc);color:var(--acc)}
+    .views .pill.on{border-color:var(--acc);color:#fff;background:var(--grad-acc);box-shadow:var(--glow-acc)}
+    .views .pill .cnt{opacity:.75;font-weight:800;margin-left:5px}
+
+    /* ---- KPI cards ---- */
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:12px;margin-bottom:16px}
+    .kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;
+      box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .kpi::after{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--grad-acc)}
+    .kpi b{display:block;font:800 26px var(--ui);color:var(--ink);line-height:1.1}
+    .kpi span{display:block;font:700 11px var(--ui);letter-spacing:.7px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+    .kpi small{display:block;font:600 11.5px/1.5 var(--ui);color:var(--muted);margin-top:5px}
+    .kpi.warn::after{background:linear-gradient(180deg,#f0b95a,#c07a1d)}
+    .kpi.alert::after{background:linear-gradient(180deg,#ff8f85,#dc2626)}
+
+    /* ---- tables ---- */
+    .tblcard{overflow:auto;max-height:70vh;border-radius:var(--radius);border:1px solid var(--line);
+      background:var(--card);box-shadow:var(--shadow)}
+    table{width:100%;border-collapse:collapse;font:600 13.5px var(--ui);min-width:900px}
+    th{padding:11px 12px;text-align:left;font-size:11px;letter-spacing:.7px;text-transform:uppercase;
+      color:var(--muted);border-bottom:1.5px solid var(--line);white-space:nowrap;
+      position:sticky;top:0;background:var(--card);z-index:3}
+    th.srt{cursor:pointer;user-select:none}
+    th.srt:hover{color:var(--acc)}
+    th .arw{opacity:.85;font-size:9px}
+    td{padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;color:var(--ink)}
+    tbody tr:last-child td{border-bottom:0}
+    tfoot td{padding:10px 12px;font:800 12.5px var(--ui);color:var(--ink);background:var(--card2);
+      border-top:1.5px solid var(--line);position:sticky;bottom:0;z-index:2}
+    tr.flag td{background:rgba(220,38,38,.08)}
+    body.dark tr.flag td{background:rgba(255,111,97,.15)}
+    tr.idle td{background:rgba(240,185,90,.10)}
+    td .flagtag{color:var(--bad);font-weight:800}
+    td .idletag{color:#b0791c;font-weight:800}
+    body.dark td .idletag{color:#f0b95a}
+    .dev{cursor:help;border-bottom:1.5px dotted var(--muted);font-weight:800}
+    .dev.multi{color:var(--acc)}
+    .hz{font-family:var(--han)}
+    .num{font-variant-numeric:tabular-nums;text-align:right}
+    td.num,th.num{text-align:right}
+    .zero{color:var(--muted);opacity:.55}
+
+    /* heat cells of the time matrix */
+    td.heat{font-weight:800;text-align:right;font-variant-numeric:tabular-nums}
+    .bar{height:6px;border-radius:4px;background:rgba(var(--heat),.85);display:block;margin-top:4px}
+
+    tr.main{cursor:pointer}
+    tr.main:hover td{background:rgba(var(--heat),.07)}
+    tr.drow td{background:var(--card2);padding:8px 16px 14px}
+    table.mini{min-width:640px;font:600 12.5px var(--ui)}
+    table.mini th{font-size:10px;padding:7px 10px;position:static}
+    table.mini td{padding:7px 10px}
+
+    .tip{position:fixed;z-index:60;max-width:340px;background:var(--ink);color:var(--bg);
+      border-radius:12px;padding:10px 12px;font:600 12px/1.55 var(--ui);box-shadow:var(--shadow-lg);
+      pointer-events:none;white-space:normal}
+    body.dark .tip{background:#eef5f0;color:#10211a}
+    .tip b{display:block;margin-bottom:3px}
+
+    .spy{display:none;margin:14px 0;padding:14px 16px;border-radius:16px;
+      background:var(--bad-soft);border:1.5px solid var(--bad-line);color:var(--bad);
+      font:700 14.5px var(--ui)}
+    .spy .ar{direction:rtl;display:block;font-weight:600;margin-top:4px}
+    .idlebox{display:none;margin:0 0 14px;padding:13px 16px;border-radius:16px;
+      background:var(--gold-soft);border:1.5px solid rgba(201,146,43,.4);color:#8a6516;
+      font:700 14px var(--ui)}
+    body.dark .idlebox{color:#f0d9a5}
+    .idlebox .ar{direction:rtl;display:block;font-weight:600;margin-top:4px}
+
+    .note{margin-top:16px;color:var(--muted);font:500 12.5px/1.7 var(--ui)}
+    .note .ar{direction:rtl;display:block;margin-top:4px}
+    .err{color:var(--bad);font:700 13.5px var(--ui);min-height:20px;margin-top:8px}
+    .gen{color:var(--muted);font:600 12px var(--ui);margin:8px 2px}
+    .hint{color:var(--muted);font:600 11.5px var(--ui);margin:2px 2px 8px}
+    .sechead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 2px 10px}
+    .sechead h2{font:800 16px var(--ui);color:var(--ink)}
+    .sechead .ar{direction:rtl;color:var(--muted);font:600 12.5px var(--ui)}
+    .sechead .grow{flex:1}
+    .btn-xs{padding:7px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);
+      color:var(--muted);font:700 12px var(--ui);cursor:pointer}
+    .btn-xs:hover{border-color:var(--acc);color:var(--acc)}
+    .empty{padding:26px;text-align:center;color:var(--muted);font:600 13px var(--ui)}
+    .lgnd{display:flex;gap:8px;align-items:center;font:600 11.5px var(--ui);color:var(--muted)}
+    .lgnd i{width:26px;height:9px;border-radius:5px;display:inline-block}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-seal">师</div>
+        <div class="brand-text">
+          <b>Teacher Dashboard</b>
+          <span>New HSK Course 1 · 教师面板</span>
+        </div>
+      </div>
+      <div class="grow"></div>
+      <a class="btn btn-ghost btn-sm" href="index.html">← Course hub</a>
+      <button class="btn btn-ghost btn-sm" id="darkBtn" title="Dark / light mode">🌙</button>
+    </div>
+
+    <div class="card" style="padding:16px 18px">
+      <div class="ctrl">
+        <input type="password" id="tCode" placeholder="Teacher code" autocomplete="off">
+        <select id="days">
+          <option value="0">All time · كل الوقت</option>
+          <option value="1">Today · اليوم</option>
+          <option value="7" selected>Last 7 days · ٧ أيام</option>
+          <option value="30">Last 30 days · ٣٠ يوماً</option>
+        </select>
+        <button class="btn btn-primary btn-sm" id="loadBtn">Load · تحميل</button>
+        <label class="ck"><input type="checkbox" id="autoRf" checked> auto-refresh 60s</label>
+        <div class="grow" style="flex:1"></div>
+        <input type="search" id="q" placeholder="🔎 search student · ابحث">
+        <select id="idleDays" title="Inactive threshold">
+          <option value="3">idle ≥ 3 days</option>
+          <option value="7" selected>idle ≥ 7 days</option>
+          <option value="14">idle ≥ 14 days</option>
+          <option value="30">idle ≥ 30 days</option>
+        </select>
+      </div>
+      <div class="err" id="err"></div>
+    </div>
+
+    <div class="views" id="views">
+      <button class="pill on" data-v="ov">📊 Overview · نظرة</button>
+      <button class="pill" data-v="time">⏱ Time per lesson · الوقت</button>
+      <button class="pill" data-v="stu">👥 Students · الطلاب</button>
+      <button class="pill" data-v="les">🎯 One lesson · درس واحد</button>
+      <button class="pill" data-v="dev">📱 Devices · الأجهزة<span class="cnt" id="devCnt"></span></button>
+      <button class="pill" data-v="log">📜 Raw log · السجل</button>
+    </div>
+
+    <div class="spy" id="spyCard"></div>
+    <div class="idlebox" id="idleCard"></div>
+    <div class="gen" id="genLine"></div>
+
+    <!-- ══════════ 1 · OVERVIEW ══════════ -->
+    <div id="v-ov">
+      <div class="kpis" id="kpis"></div>
+      <div class="sechead">
+        <h2>Class per lesson · أداء الصف لكل درس</h2>
+        <span class="ar">الدقائق محسوبة من وقت الدراسة الفعلي الظاهر للطالب</span>
+        <div class="grow"></div>
+        <button class="btn-xs" id="csvTot">⬇ CSV</button>
+      </div>
+      <div class="tblcard">
+        <table style="min-width:760px">
+          <thead><tr>
+            <th>Lesson · الدرس</th><th class="num">Students · طالب</th><th class="num">Opens · دخول</th>
+            <th class="num">Minutes · دقيقة</th><th class="num">Avg / student</th><th class="num">Max</th>
+            <th class="num">Quiz best</th>
+          </tr></thead>
+          <tbody id="totBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════════ 2 · TIME MATRIX ══════════ -->
+    <div id="v-time" style="display:none">
+      <div class="sechead">
+        <h2>Study time matrix · مصفوفة وقت الدراسة</h2>
+        <span class="ar">طالب × درس — الخلايا بالدقائق، واللون يدل على الكثافة</span>
+        <div class="grow"></div>
+        <div class="lgnd"><i style="background:rgba(var(--heat),.15)"></i> أقل
+          <i style="background:rgba(var(--heat),.45)"></i>
+          <i style="background:rgba(var(--heat),.85)"></i> أكثر</div>
+        <button class="btn-xs" id="csvTime">⬇ CSV</button>
+      </div>
+      <div class="hint">💡 click any cell to jump to that student × lesson detail · اضغط على خلية لتفاصيلها</div>
+      <div class="tblcard"><table id="mtx"><thead id="mtxHead"></thead><tbody id="mtxBody"></tbody><tfoot id="mxFoot"></tfoot></table></div>
+    </div>
+
+    <!-- ══════════ 3 · STUDENTS ══════════ -->
+    <div id="v-stu" style="display:none">
+      <div class="sechead">
+        <h2>Students · الطلاب</h2>
+        <span class="ar">اضغط رأس العمود للترتيب · واضغط صف الطالب لتفاصيل دروسه</span>
+        <div class="grow"></div>
+        <button class="btn-xs" id="csvStu">⬇ CSV</button>
+      </div>
+      <div class="tblcard">
+        <table id="dashTbl">
+          <thead id="dashHead"></thead>
+          <tbody id="dashBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════════ 4 · ONE LESSON ══════════ -->
+    <div id="v-les" style="display:none">
+      <div class="sechead">
+        <h2>Lesson drill-down · درس واحد</h2>
+        <select id="lesSel" style="padding:9px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:700 13px var(--ui)"></select>
+        <span class="ar" id="lesSub"></span>
+        <div class="grow"></div>
+        <button class="btn-xs" id="csvLes">⬇ CSV</button>
+      </div>
+      <div class="kpis" id="lesKpis"></div>
+      <div class="tblcard">
+        <table style="min-width:820px">
+          <thead><tr>
+            <th>Student · الطالب</th><th class="num">Minutes · دقيقة</th><th class="num">Opens</th>
+            <th class="num">Quiz best</th><th class="num">Drill</th><th class="num">Mastered · أتقن</th>
+            <th>Last seen · آخر ظهور</th>
+          </tr></thead>
+          <tbody id="lesBody"></tbody>
+        </table>
+      </div>
+      <div class="sechead" style="margin-top:18px"><h2>Never opened this lesson · لم يفتحوا هذا الدرس</h2></div>
+      <div class="tblcard"><div id="lesNone" class="empty">—</div></div>
+    </div>
+
+    <!-- ══════════ 5 · DEVICES ══════════ -->
+    <div id="v-dev" style="display:none">
+      <div class="sechead">
+        <h2>Devices &amp; sharing flags · الأجهزة وأعلام المشاركة</h2>
+        <span class="ar">جهازان باسم واحد خلال نافذة ساعتين = «same-time use!»</span>
+        <div class="grow"></div>
+        <button class="btn-xs" id="csvDev">⬇ CSV</button>
+      </div>
+      <div class="tblcard">
+        <table style="min-width:840px">
+          <thead><tr>
+            <th>Student · الطالب</th><th>Device · الجهاز</th><th>First · أول مرة</th>
+            <th>Last · آخر مرة</th><th class="num">Logins</th><th>⚠</th>
+          </tr></thead>
+          <tbody id="devBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════════ 6 · RAW LOG ══════════ -->
+    <div id="v-log" style="display:none">
+      <div class="sechead">
+        <h2>Raw log · السجل الخام</h2>
+        <span class="ar">آخر 200 حدث · الأحدث أولاً</span>
+        <div class="grow"></div>
+        <button class="btn-xs" id="csvLog">⬇ CSV</button>
+      </div>
+      <div class="tblcard">
+        <table id="logTbl">
+          <thead><tr>
+            <th>Time</th><th>Event</th><th>Student</th><th>L</th><th>Detail</th>
+            <th class="num">Score</th><th class="num">Sec</th><th>Device</th><th>DevLabel</th>
+          </tr></thead>
+          <tbody id="logBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="note">
+      🔒 Codes never leave the teacher's sheet. This page only reads aggregated progress and the
+      event log (with device labels) over the private teacher code.
+      <span class="ar">الأكواد لا تغادر شيتة المعلم؛ هذه الصفحة تقرأ الملخص وسجل الأحداث فقط بكود المعلم الخاص.</span>
+    </div>
+  </div>
+
+  <div class="tip" id="tip" style="display:none"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/sheets.js"></script>
+  <script src="js/course.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var $ = function (s) { return document.querySelector(s); };
+      var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+
+      /* ══════════ dark mode (shared course setting) ══════════ */
+      var SETT = 'hsk1:settings';
+      function readJSON(k, d) { try { var v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }
+      function writeJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+      var dark = readJSON(SETT, {}).dark;
+      if (dark == null) dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+      function applyDark() {
+        document.body.classList.toggle('dark', !!dark);
+        $('#darkBtn').textContent = dark ? '☀️' : '🌙';
+      }
+      applyDark();
+      $('#darkBtn').addEventListener('click', function () {
+        dark = !dark;
+        writeJSON(SETT, Object.assign(readJSON(SETT, {}), { dark: dark }));
+        applyDark();
+      });
+
+      if (!window.HSK1 || !HSK1.enabled()) {
+        $('#err').textContent = 'No Google Sheets bridge configured (js/config.js → sheetsUrl is empty).';
+      }
+
+      /* ══════════ state ══════════ */
+      var view = 'ov';
+      var DATA = null;            // last /progress payload
+      var LOG = null;             // last /tail payload
+      var sortKey = 'lastSeenMs', sortDir = -1;
+      var query = '';
+      var curLesson = 1;
+
+      $('#tCode').value = localStorage.getItem('hsk1:teacherCode') || '';
+      $('#tCode').addEventListener('change', function () {
+        localStorage.setItem('hsk1:teacherCode', $('#tCode').value.trim());
+      });
+      function code() { return $('#tCode').value.trim(); }
+      function days() { return $('#days').value; }
+      function idleDays() { return parseInt($('#idleDays').value, 10) || 7; }
+
+      function fail(res) {
+        $('#err').textContent = (res && res.error === 'bad_teacher_code')
+          ? 'Wrong teacher code · كود المعلم خاطئ'
+          : ('Failed: ' + ((res && res.error) || 'network'));
+      }
+
+      /* ══════════ helpers ══════════ */
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+        });
+      }
+      function fmtMs(ms) {
+        if (!ms) return '—';
+        var d = new Date(ms), diff = Date.now() - ms;
+        if (diff < 3600000) return Math.max(1, Math.round(diff / 60000)) + ' min ago';
+        if (diff < 86400000) return Math.round(diff / 3600000) + ' h ago';
+        return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' ' +
+               d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+      }
+      function fmtMin(m) {                       // 0 → "0m" · 75 → "1h 15m"
+        m = Math.round(m || 0);
+        if (!m) return '0m';
+        var h = Math.floor(m / 60);
+        return h ? (h + 'h ' + (m % 60 ? (m % 60) + 'm' : '')) : (m + 'm');
+      }
+      function daysSince(ms) { return ms ? (Date.now() - ms) / 86400000 : Infinity; }
+
+      /* lesson registry (course.js) → [{n,hz,en}] for all 15 even with no activity */
+      function lessons() {
+        var C = window.COURSE;
+        if (C && C.lessons && C.lessons.length) {
+          return C.lessons.map(function (l) { return { n: l.n, hz: l.hz || '', en: l.en || '' }; });
+        }
+        var out = []; for (var i = 1; i <= 15; i++) out.push({ n: i, hz: '', en: '' });
+        return out;
+      }
+      function lessonLabel(n) {
+        var L = lessons().filter(function (x) { return x.n === n; })[0];
+        return 'L' + n + (L && L.hz ? ' · ' + L.hz : '');
+      }
+      function isReady(n) {
+        var C = window.COURSE;
+        if (!C || !C.lessons) return true;
+        var L = C.lessons.filter(function (x) { return x.n === n; })[0];
+        return !L || L.status === 'ready';
+      }
+
+      function detailOf(stu, n) {
+        var d = (stu.lessonsDetail || []).filter(function (x) { return x.n === n; })[0];
+        return d || { n: n, opens: 0, seconds: 0, minutes: 0, quizBest: 0, quizN: 0, drillBest: 0, mastered: 0, total: 0, lastMs: 0 };
+      }
+      function idleList() {
+        if (!DATA) return [];
+        var t = idleDays();
+        return DATA.students.filter(function (s) { return daysSince(s.lastSeenMs) >= t; });
+      }
+      function visibleStudents() {
+        if (!DATA) return [];
+        var q = query.trim().toLowerCase();
+        var list = DATA.students.filter(function (s) { return !q || String(s.name).toLowerCase().indexOf(q) !== -1; });
+        list.sort(function (a, b) {
+          var x = a[sortKey], y = b[sortKey];
+          if (sortKey === 'name') { x = String(x).toLowerCase(); y = String(y).toLowerCase(); }
+          if (x == null) x = sortDir > 0 ? Infinity : -Infinity;
+          if (y == null) y = sortDir > 0 ? Infinity : -Infinity;
+          return (x < y ? -1 : x > y ? 1 : 0) * sortDir;
+        });
+        return list;
+      }
+
+      /* class-level per-lesson aggregation (backend sends opens/students only → minutes computed here) */
+      function classLessons() {
+        var map = {};
+        lessons().forEach(function (L) { map[L.n] = { n: L.n, students: 0, opens: 0, minutes: 0, max: 0, quizBest: 0 }; });
+        (DATA ? DATA.students : []).forEach(function (s) {
+          (s.lessonsDetail || []).forEach(function (d) {
+            var m = map[d.n] || (map[d.n] = { n: d.n, students: 0, opens: 0, minutes: 0, max: 0, quizBest: 0 });
+            if (d.minutes > 0 || d.opens > 0) m.students++;
+            m.opens += d.opens || 0;
+            m.minutes += d.minutes || 0;
+            if ((d.minutes || 0) > m.max) m.max = d.minutes;
+            if ((d.quizBest || 0) > m.quizBest) m.quizBest = d.quizBest;
+          });
+        });
+        var out = []; for (var k in map) out.push(map[k]);
+        out.sort(function (a, b) { return a.n - b.n; });
+        return out;
+      }
+
+      /* ══════════ CSV export ══════════ */
+      function csv(name, head, rows) {
+        function cell(v) {
+          v = (v == null ? '' : String(v));
+          return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+        }
+        var txt = '\ufeff' + [head.map(cell).join(',')].concat(rows.map(function (r) {
+          return r.map(cell).join(',');
+        })).join('\r\n');
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([txt], { type: 'text/csv;charset=utf-8' }));
+        a.download = name;
+        document.body.appendChild(a); a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 400);
+      }
+
+      /* ══════════ render: alerts ══════════ */
+      function renderAlerts() {
+        var flagged = DATA.students.filter(function (s) { return s.shareFlag; });
+        var spy = $('#spyCard');
+        if (flagged.length) {
+          spy.style.display = 'block';
+          spy.innerHTML = '🕵️ possible sharing — ' + flagged.length + ' student(s): ' +
+            flagged.map(function (s) { return '<b>' + esc(s.name) + '</b>'; }).join(', ') +
+            ' — two or more devices under the same name inside a 2-hour window · same-time use!' +
+            '<span class="ar">استخدام متزامن محتمل: اسم واحد على جهازين أو أكثر خلال نافذة ساعتين.</span>';
+        } else spy.style.display = 'none';
+
+        var idle = idleList();
+        var box = $('#idleCard');
+        if (idle.length) {
+          box.style.display = 'block';
+          box.innerHTML = '💤 idle ≥ ' + idleDays() + ' days — ' + idle.length + ' student(s): ' +
+            idle.map(function (s) {
+              return '<b>' + esc(s.name) + '</b> (' + (s.lastSeenMs ? Math.floor(daysSince(s.lastSeenMs)) + 'd' : 'never') + ')';
+            }).join(', ') +
+            '<span class="ar">طلاب لم يدرسوا منذ ' + idleDays() + ' أيام أو أكثر — يستحسن متابعة أحدهم.</span>';
+        } else box.style.display = 'none';
+      }
+
+      /* ══════════ render: KPI cards ══════════ */
+      function renderKpis() {
+        var S = DATA.students, n = S.length;
+        var minutes = S.reduce(function (a, s) { return a + (s.minutes || 0); }, 0);
+        var today = S.filter(function (s) { return s.activeToday; }).length;
+        var quizTakers = S.filter(function (s) { return s.quizN; });
+        var quizAvg = quizTakers.length
+          ? Math.round(quizTakers.reduce(function (a, s) { return a + s.quizAvg; }, 0) / quizTakers.length * 10) / 10 : 0;
+        var touched = classLessons().filter(function (c) { return c.students > 0; }).length;
+        var flags = S.filter(function (s) { return s.shareFlag; }).length;
+        var idle = idleList().length;
+        var top = S.slice().sort(function (a, b) { return (b.minutes || 0) - (a.minutes || 0); })[0];
+        var best = S.slice().sort(function (a, b) { return (b.quizBest || 0) - (a.quizBest || 0); })[0];
+
+        $('#kpis').innerHTML = [
+          { k: 'Students · الطلاب', v: n, s: today + ' active today · نشط اليوم', c: '' },
+          { k: 'Study time · وقت الدراسة', v: fmtMin(minutes), s: n ? 'avg ' + fmtMin(minutes / n) + ' / student' : '—', c: '' },
+          { k: 'Lessons touched · دروس مفعّلة', v: touched + '/' + lessons().length, s: 'with at least one open', c: '' },
+          { k: 'Quiz average · متوسط الاختبار', v: quizAvg ? quizAvg + '/10' : '—', s: quizTakers.length + ' student(s) took a quiz', c: '' },
+          { k: 'Top student · الأكثر دراسة', v: top ? fmtMin(top.minutes) : '—', s: top ? esc(top.name) : '', c: '' },
+          { k: '⚠ Sharing flags · أعلام', v: flags, s: flags ? 'same-time use!' : 'all clear', c: flags ? 'alert' : '' },
+          { k: '💤 Idle · خاملون', v: idle, s: '≥ ' + idleDays() + ' days with no activity', c: idle ? 'warn' : '' }
+        ].map(function (x) {
+          return '<div class="kpi ' + x.c + '"><span>' + x.k + '</span><b>' + x.v + '</b><small>' + x.s + '</small></div>';
+        }).join('');
+      }
+
+      /* ══════════ render: class per-lesson table ══════════ */
+      function renderTotals() {
+        var rows = classLessons();
+        $('#totBody').innerHTML = rows.map(function (c) {
+          var avg = c.students ? Math.round(c.minutes / c.students) : 0;
+          return '<tr' + (isReady(c.n) ? '' : ' style="opacity:.55"') + '>' +
+            '<td><b>' + lessonLabel(c.n) + '</b>' + (isReady(c.n) ? '' : ' <span class="zero">🔒 soon</span>') + '</td>' +
+            '<td class="num">' + (c.students || '<span class="zero">0</span>') + '</td>' +
+            '<td class="num">' + (c.opens || '<span class="zero">0</span>') + '</td>' +
+            '<td class="num">' + (c.minutes ? fmtMin(c.minutes) : '<span class="zero">—</span>') + '</td>' +
+            '<td class="num">' + (avg ? fmtMin(avg) : '<span class="zero">—</span>') + '</td>' +
+            '<td class="num">' + (c.max ? fmtMin(c.max) : '<span class="zero">—</span>') + '</td>' +
+            '<td class="num">' + (c.quizBest ? c.quizBest + '/10' : '<span class="zero">—</span>') + '</td>' +
+            '</tr>';
+        }).join('') || '<tr><td colspan="7" class="empty">no data · لا بيانات</td></tr>';
+      }
+
+      /* ══════════ render: time matrix ══════════ */
+      function renderMatrix() {
+        var LS = lessons(), S = visibleStudents();
+        var max = 1;
+        S.forEach(function (s) { (s.lessonsDetail || []).forEach(function (d) { if (d.minutes > max) max = d.minutes; }); });
+
+        $('#mtxHead').innerHTML = '<tr><th>Student · الطالب</th>' +
+          LS.map(function (L) {
+            return '<th class="num" title="' + esc(L.en) + '">L' + L.n +
+              (L.hz ? '<br><span class="hz" style="font-size:11px;text-transform:none;letter-spacing:0">' + esc(L.hz) + '</span>' : '') + '</th>';
+          }).join('') + '<th class="num">Total · المجموع</th></tr>';
+
+        var colTot = LS.map(function () { return { min: 0, stu: 0 }; });
+        $('#mtxBody').innerHTML = S.map(function (s) {
+          var cells = LS.map(function (L, i) {
+            var d = detailOf(s, L.n), m = d.minutes || 0;
+            colTot[i].min += m; if (m) colTot[i].stu++;
+            var a = m ? (0.12 + 0.73 * Math.min(1, m / max)).toFixed(2) : 0;
+            return '<td class="heat" data-s="' + esc(s.name) + '" data-l="' + L.n + '"' +
+              (m ? ' style="background:rgba(var(--heat),' + a + ')" title="' + d.opens + ' open(s) · ' + fmtMin(m) + '"' : '') + '>' +
+              (m ? m : '<span class="zero">·</span>') + '</td>';
+          }).join('');
+          return '<tr' + (s.shareFlag ? ' class="flag"' : '') + '><td><b>' + esc(s.name) + '</b></td>' + cells +
+            '<td class="num"><b>' + fmtMin(s.minutes || 0) + '</b></td></tr>';
+        }).join('') || '<tr><td colspan="' + (LS.length + 2) + '" class="empty">no students · لا طلاب</td></tr>';
+
+        $('#mxFoot').innerHTML = '<tr><td>Class total · مجموع الصف</td>' +
+          colTot.map(function (c) { return '<td class="num">' + (c.min ? fmtMin(c.min) : '—') + '</td>'; }).join('') +
+          '<td class="num">' + fmtMin(S.reduce(function (a, s) { return a + (s.minutes || 0); }, 0)) + '</td></tr>' +
+          '<tr><td>Avg / student · المتوسط</td>' +
+          colTot.map(function (c) { return '<td class="num">' + (c.stu ? fmtMin(c.min / c.stu) : '—') + '</td>'; }).join('') +
+          '<td class="num">' + (S.length ? fmtMin(S.reduce(function (a, s) { return a + (s.minutes || 0); }, 0) / S.length) : '—') + '</td></tr>';
+
+        $$('#mtxBody td.heat').forEach(function (td) {
+          td.style.cursor = 'pointer';
+          td.addEventListener('click', function () {
+            curLesson = parseInt(td.dataset.l, 10);
+            $('#lesSel').value = String(curLesson);
+            query = td.dataset.s; $('#q').value = query;
+            show('stu'); renderStudents();
+            query = ''; $('#q').value = '';
+            show('les'); renderLesson();
+          });
+        });
+      }
+
+      /* ══════════ render: students table (sortable) ══════════ */
+      var COLS = [
+        { k: 'name', t: 'Student · الطالب' },
+        { k: 'lastSeenMs', t: 'Last seen · آخر ظهور' },
+        { k: 'activeToday', t: 'Today' },
+        { k: 'logins', t: 'Logins', num: 1 },
+        { k: 'lessons', t: 'Lessons', num: 1 },
+        { k: 'minutes', t: 'Minutes ⏱', num: 1 },
+        { k: 'quizBest', t: 'Quiz best (avg)', num: 1 },
+        { k: 'drillBest', t: 'Drill', num: 1 },
+        { k: 'flashN', t: 'Flash', num: 1 },
+        { k: 'masteryPct', t: 'Mastered · إتقان', num: 1 },
+        { k: 'events', t: 'Events', num: 1 },
+        { k: 'deviceCount', t: 'Devices', num: 1 },
+        { k: 'shareFlag', t: '⚠' }
+      ];
+      function masteryOf(s) {
+        var d = s.lessonsDetail || [], m = 0, t = 0;
+        d.forEach(function (x) { m += x.mastered || 0; t += x.total || 0; });
+        return t ? Math.round(m / t * 100) : 0;
+      }
+      function renderStudents() {
+        $('#dashHead').innerHTML = '<tr>' + COLS.map(function (c) {
+          return '<th class="srt' + (c.num ? ' num' : '') + '" data-k="' + c.k + '">' + c.t +
+            (sortKey === c.k ? ' <span class="arw">' + (sortDir > 0 ? '▲' : '▼') + '</span>' : '') + '</th>';
+        }).join('') + '</tr>';
+
+        var list = visibleStudents().map(function (s) { s.masteryPct = masteryOf(s); return s; });
+        var t = idleDays();
+        $('#dashBody').innerHTML = list.map(function (s) {
+          var idx = DATA.students.indexOf(s);
+          var idle = daysSince(s.lastSeenMs) >= t;
+          var det = s.lessonsDetail || [];
+          var mini = det.length
+            ? '<table class="mini"><thead><tr><th>L</th><th>Opens دخول</th><th>Minutes ⏱</th><th>Quiz</th><th>Drill</th><th>Mastered</th><th>Last</th></tr></thead><tbody>' +
+              det.sort(function (a, b) { return a.n - b.n; }).map(function (d) {
+                return '<tr><td><b>' + lessonLabel(d.n) + '</b></td><td>' + d.opens + '</td><td><b>' + fmtMin(d.minutes) + '</b></td><td>' +
+                  d.quizBest + '/10</td><td>' + d.drillBest + '</td><td>' +
+                  (d.total ? d.mastered + '/' + d.total : '—') + '</td><td>' + fmtMs(d.lastMs) + '</td></tr>';
+              }).join('') + '</tbody></table>'
+            : '<span style="color:var(--muted);font:600 12px var(--ui)">no per-lesson activity yet · لا نشاط بعد</span>';
+
+          return '<tr class="main ' + (s.shareFlag ? 'flag ' : '') + (idle ? 'idle' : '') + '" data-i="' + idx + '">' +
+            '<td><b>' + esc(s.name) + '</b>' + (idle ? ' <span class="idletag">💤</span>' : '') + '</td>' +
+            '<td>' + fmtMs(s.lastSeenMs) + '</td>' +
+            '<td>' + (s.activeToday ? '🟢' : '<span class="zero">—</span>') + '</td>' +
+            '<td class="num">' + s.logins + '</td>' +
+            '<td class="num">' + s.lessons + '</td>' +
+            '<td class="num"><b>' + fmtMin(s.minutes || 0) + '</b></td>' +
+            '<td class="num">' + s.quizBest + '/10' + (s.quizN ? ' <span class="zero">(avg ' + s.quizAvg + ')</span>' : '') + '</td>' +
+            '<td class="num">' + s.drillBest + '</td>' +
+            '<td class="num">' + s.flashN + '</td>' +
+            '<td class="num">' + (s.masteryPct ? s.masteryPct + '%' : '<span class="zero">—</span>') + '</td>' +
+            '<td class="num">' + s.events + '</td>' +
+            '<td class="num"><span class="dev ' + (s.deviceCount > 1 ? 'multi' : '') + '" data-i="' + idx + '">' + s.deviceCount + '</span></td>' +
+            '<td>' + (s.shareFlag ? '<span class="flagtag">same-time use!</span>' : '') + '</td>' +
+            '</tr>' +
+            '<tr class="drow" id="drow-' + idx + '" style="display:none"><td colspan="' + COLS.length + '">' + mini + '</td></tr>';
+        }).join('') || '<tr><td colspan="' + COLS.length + '" class="empty">no match · لا نتائج</td></tr>';
+
+        $$('#dashHead th.srt').forEach(function (th) {
+          th.addEventListener('click', function () {
+            var k = th.dataset.k;
+            if (sortKey === k) sortDir = -sortDir;
+            else { sortKey = k; sortDir = (k === 'name') ? 1 : -1; }
+            renderStudents();
+          });
+        });
+        $$('#dashBody .dev').forEach(function (el) {
+          el.addEventListener('mouseenter', function () {
+            var s = DATA.students[+el.dataset.i], tip = $('#tip');
+            tip.innerHTML = '<b>' + esc(s.name) + ' — ' + s.deviceCount + ' device(s)</b>' +
+              (s.devices || []).map(function (d) {
+                return '• ' + esc(d.label || d.id) + '<br>&nbsp;&nbsp;first ' + fmtMs(d.firstMs) +
+                  ' · last ' + fmtMs(d.lastMs) + ' · logins ' + d.logins;
+              }).join('<br>');
+            tip.style.display = 'block';
+            var r = el.getBoundingClientRect();
+            tip.style.left = Math.min(window.innerWidth - 350, r.left) + 'px';
+            tip.style.top = (r.bottom + 8) + 'px';
+          });
+          el.addEventListener('mouseleave', function () { $('#tip').style.display = 'none'; });
+        });
+        $$('#dashBody tr.main').forEach(function (tr) {
+          tr.addEventListener('click', function (e) {
+            if (e.target.classList.contains('dev')) return;
+            var d = document.getElementById('drow-' + tr.dataset.i);
+            if (d) d.style.display = (d.style.display === 'none') ? '' : 'none';
+          });
+        });
+      }
+
+      /* ══════════ render: one-lesson drill-down ══════════ */
+      function renderLesson() {
+        var sel = $('#lesSel');
+        if (!sel.options.length) {
+          sel.innerHTML = lessons().map(function (L) {
+            return '<option value="' + L.n + '">' + lessonLabel(L.n) + (L.en ? ' — ' + esc(L.en) : '') +
+              (isReady(L.n) ? '' : ' 🔒') + '</option>';
+          }).join('');
+        }
+        var n = curLesson = parseInt(sel.value, 10) || 1;
+        var rows = DATA.students.map(function (s) { return { s: s, d: detailOf(s, n) }; })
+          .sort(function (a, b) { return (b.d.minutes - a.d.minutes) || (b.d.opens - a.d.opens); });
+        var studied = rows.filter(function (r) { return r.d.minutes || r.d.opens; });
+        var none = rows.filter(function (r) { return !(r.d.minutes || r.d.opens); });
+
+        var mins = studied.reduce(function (a, r) { return a + r.d.minutes; }, 0);
+        var bestQuiz = studied.reduce(function (a, r) { return Math.max(a, r.d.quizBest); }, 0);
+        $('#lesSub').textContent = (isReady(n) ? '' : '🔒 not published yet · ') +
+          studied.length + ' studied · ' + fmtMin(mins) + ' total';
+        $('#lesKpis').innerHTML = [
+          { k: 'Studied it · درسه', v: studied.length + '/' + DATA.students.length, s: lessonLabel(n) },
+          { k: 'Class minutes · دقائق الصف', v: fmtMin(mins), s: studied.length ? 'avg ' + fmtMin(mins / studied.length) : '—' },
+          { k: 'Opens · عدد الدخول', v: studied.reduce(function (a, r) { return a + r.d.opens; }, 0), s: 'total opens' },
+          { k: 'Best quiz · أفضل نتيجة', v: bestQuiz ? bestQuiz + '/10' : '—', s: bestQuiz ? '' : 'no quiz yet' },
+          { k: 'Never opened · لم يفتحه', v: none.length, s: none.length ? 'see list below' : 'everyone opened it ✅' }
+        ].map(function (x) {
+          return '<div class="kpi' + (x.k.indexOf('Never') === 0 && x.v ? ' warn' : '') + '"><span>' + x.k +
+            '</span><b>' + x.v + '</b><small>' + esc(x.s) + '</small></div>';
+        }).join('');
+
+        $('#lesBody').innerHTML = studied.map(function (r) {
+          return '<tr><td><b>' + esc(r.s.name) + '</b></td>' +
+            '<td class="num"><b>' + fmtMin(r.d.minutes) + '</b></td>' +
+            '<td class="num">' + r.d.opens + '</td>' +
+            '<td class="num">' + (r.d.quizBest ? r.d.quizBest + '/10' : '<span class="zero">—</span>') + '</td>' +
+            '<td class="num">' + (r.d.drillBest || '<span class="zero">—</span>') + '</td>' +
+            '<td class="num">' + (r.d.total ? r.d.mastered + '/' + r.d.total : '<span class="zero">—</span>') + '</td>' +
+            '<td>' + fmtMs(r.d.lastMs) + '</td></tr>';
+        }).join('') || '<tr><td colspan="7" class="empty">no one studied this lesson yet · لم يدرسه أحد بعد</td></tr>';
+
+        $('#lesNone').innerHTML = none.length
+          ? none.map(function (r) {
+              return '<span style="display:inline-block;margin:3px 8px 3px 0;padding:6px 11px;border-radius:999px;' +
+                'background:var(--gold-soft);border:1px solid rgba(201,146,43,.35);font:700 12.5px var(--ui);color:#8a6516">' +
+                esc(r.s.name) + (r.s.lastSeenMs ? ' · ' + fmtMs(r.s.lastSeenMs) : ' · never seen') + '</span>';
+            }).join('')
+          : '✅ everyone opened this lesson · الجميع فتحه';
+      }
+
+      /* ══════════ render: devices ══════════ */
+      function renderDevices() {
+        var rows = [];
+        visibleStudents().forEach(function (s) {
+          (s.devices || []).forEach(function (d) {
+            rows.push({ s: s, d: d });
+          });
+          if (!(s.devices || []).length) rows.push({ s: s, d: null });
+        });
+        $('#devBody').innerHTML = rows.map(function (r) {
+          return '<tr' + (r.s.shareFlag ? ' class="flag"' : '') + '><td><b>' + esc(r.s.name) + '</b></td>' +
+            '<td>' + (r.d ? esc(r.d.label || r.d.id) + ' <span class="zero">' + esc(String(r.d.id).slice(0, 8)) + '</span>' : '<span class="zero">—</span>') + '</td>' +
+            '<td>' + (r.d ? fmtMs(r.d.firstMs) : '—') + '</td>' +
+            '<td>' + (r.d ? fmtMs(r.d.lastMs) : '—') + '</td>' +
+            '<td class="num">' + (r.d ? r.d.logins : 0) + '</td>' +
+            '<td>' + (r.s.shareFlag ? '<span class="flagtag">same-time use!</span>' : '') + '</td></tr>';
+        }).join('') || '<tr><td colspan="6" class="empty">no devices yet · لا أجهزة بعد</td></tr>';
+        var flagged = DATA.students.filter(function (s) { return s.shareFlag; }).length;
+        var multi = DATA.students.filter(function (s) { return s.deviceCount > 1; }).length;
+        $('#devCnt').textContent = (flagged || multi) ? ' (' + DATA.students.reduce(function (a, s) { return a + s.deviceCount; }, 0) + ')' : '';
+      }
+
+      /* ══════════ render: raw log ══════════ */
+      function renderLog() {
+        if (!LOG) return;
+        $('#logBody').innerHTML = LOG.rows.map(function (r) {
+          return '<tr>' +
+            '<td>' + esc(r.ts) + '</td><td>' + esc(r.event) + '</td>' +
+            '<td><b>' + esc(r.student) + '</b></td><td>' + esc(r.lesson) + '</td>' +
+            '<td>' + esc(r.detail) + '</td>' +
+            '<td class="num">' + (r.score === '' ? '' : r.score + (r.total ? '/' + r.total : '')) + '</td>' +
+            '<td class="num">' + (r.seconds === '' ? '' : r.seconds) + '</td>' +
+            '<td>' + esc(r.device ? String(r.device).slice(0, 8) : '') + '</td>' +
+            '<td>' + esc(r.devLabel) + '</td></tr>';
+        }).join('') || '<tr><td colspan="9" class="empty">empty log · السجل فارغ</td></tr>';
+      }
+
+      /* ══════════ load ══════════ */
+      function loadProgress() {
+        if (!HSK1.enabled() || !code()) { fail({ error: 'bad_teacher_code' }); return Promise.resolve(); }
+        return HSK1.get({ action: 'progress', code: code(), days: days() }).then(function (res) {
+          if (!res || !res.ok) { fail(res); return; }
+          $('#err').textContent = '';
+          DATA = res;
+          $('#genLine').textContent = 'generated ' + res.generated + ' · window: ' +
+            (res.days ? res.days + ' days' : 'all time') + ' · ' + res.students.length + ' students';
+          renderAlerts(); renderKpis(); renderTotals();
+          renderMatrix(); renderStudents(); renderLesson(); renderDevices();
+        }).catch(function (r) { fail(r); });
+      }
+      function loadLog() {
+        if (!HSK1.enabled() || !code()) { fail({ error: 'bad_teacher_code' }); return Promise.resolve(); }
+        return HSK1.get({ action: 'tail', code: code(), rows: 200 }).then(function (res) {
+          if (!res || !res.ok) { fail(res); return; }
+          $('#err').textContent = '';
+          LOG = res;
+          $('#genLine').textContent = 'last ' + res.rows.length + ' events · newest first';
+          renderLog();
+        }).catch(function (r) { fail(r); });
+      }
+      function refresh() {
+        if (!DATA && !code()) return;
+        var p = loadProgress();
+        if (view === 'log') p.then(loadLog);
+        return p;
+      }
+
+      /* ══════════ tabs ══════════ */
+      function show(v) {
+        view = v;
+        $$('#views .pill').forEach(function (b) { b.classList.toggle('on', b.dataset.v === v); });
+        ['ov', 'time', 'stu', 'les', 'dev', 'log'].forEach(function (k) {
+          $('#v-' + k).style.display = (k === v) ? '' : 'none';
+        });
+        if (v === 'log' && code()) loadLog();
+      }
+      $$('#views .pill').forEach(function (b) {
+        b.addEventListener('click', function () { show(b.dataset.v); });
+      });
+
+      /* ══════════ controls ══════════ */
+      $('#loadBtn').addEventListener('click', refresh);
+      $('#days').addEventListener('change', refresh);
+      $('#q').addEventListener('input', function () {
+        query = $('#q').value;
+        if (DATA) { renderMatrix(); renderStudents(); renderDevices(); }
+      });
+      $('#idleDays').addEventListener('change', function () { if (DATA) { renderAlerts(); renderKpis(); renderStudents(); } });
+      $('#lesSel').addEventListener('change', function () { if (DATA) renderLesson(); });
+      setInterval(function () { if ($('#autoRf').checked && code()) refresh(); }, 60000);
+
+      /* ══════════ CSV buttons ══════════ */
+      $('#csvTot').addEventListener('click', function () {
+        csv('hsk1-class-per-lesson.csv',
+          ['Lesson', 'Title', 'Students', 'Opens', 'Minutes', 'AvgMinutesPerStudent', 'MaxMinutes', 'QuizBest'],
+          classLessons().map(function (c) {
+            var L = lessons().filter(function (x) { return x.n === c.n; })[0] || {};
+            return [c.n, L.hz || '', c.students, c.opens, c.minutes,
+              c.students ? Math.round(c.minutes / c.students) : 0, c.max, c.quizBest];
+          }));
+      });
+      $('#csvTime').addEventListener('click', function () {
+        var LS = lessons();
+        csv('hsk1-time-matrix.csv', ['Student'].concat(LS.map(function (L) { return 'L' + L.n + ' min'; })).concat(['Total min']),
+          visibleStudents().map(function (s) {
+            return [s.name].concat(LS.map(function (L) { return detailOf(s, L.n).minutes || 0; })).concat([s.minutes || 0]);
+          }));
+      });
+      $('#csvStu').addEventListener('click', function () {
+        csv('hsk1-students.csv',
+          ['Student', 'LastSeen', 'ActiveToday', 'Logins', 'Lessons', 'Minutes', 'QuizBest', 'QuizAvg',
+           'DrillBest', 'Flashcards', 'MasteredPct', 'Events', 'Devices', 'ShareFlag', 'IdleDays'],
+          visibleStudents().map(function (s) {
+            return [s.name, s.lastSeen || '', s.activeToday ? 'yes' : 'no', s.logins, s.lessons, s.minutes || 0,
+              s.quizBest, s.quizAvg, s.drillBest, s.flashN, masteryOf(s), s.events, s.deviceCount,
+              s.shareFlag ? 'FLAG' : '', s.lastSeenMs ? Math.floor(daysSince(s.lastSeenMs)) : ''];
+          }));
+      });
+      $('#csvLes').addEventListener('click', function () {
+        var n = curLesson;
+        csv('hsk1-lesson' + n + '.csv', ['Student', 'Minutes', 'Opens', 'QuizBest', 'DrillBest', 'Mastered', 'Total', 'LastSeenMs'],
+          DATA.students.map(function (s) {
+            var d = detailOf(s, n);
+            return [s.name, d.minutes, d.opens, d.quizBest, d.drillBest, d.mastered, d.total, d.lastMs ? new Date(d.lastMs).toISOString() : ''];
+          }).sort(function (a, b) { return b[1] - a[1]; }));
+      });
+      $('#csvDev').addEventListener('click', function () {
+        var rows = [];
+        DATA.students.forEach(function (s) {
+          (s.devices || []).forEach(function (d) {
+            rows.push([s.name, d.label || '', d.id, d.logins, new Date(d.firstMs).toISOString(), new Date(d.lastMs).toISOString(), s.shareFlag ? 'FLAG' : '']);
+          });
+        });
+        csv('hsk1-devices.csv', ['Student', 'DeviceLabel', 'DeviceId', 'Logins', 'First', 'Last', 'ShareFlag'], rows);
+      });
+      $('#csvLog').addEventListener('click', function () {
+        if (!LOG) return;
+        csv('hsk1-raw-log.csv', ['Time', 'Event', 'Student', 'Lesson', 'Detail', 'Score', 'Total', 'Seconds', 'Device', 'DevLabel'],
+          LOG.rows.map(function (r) {
+            return [r.ts, r.event, r.student, r.lesson, r.detail, r.score, r.total, r.seconds, r.device, r.devLabel];
+          }));
+      });
+
+      show('ov');
+      if (code()) refresh();
+    })();
+  </script>
+</body>
+</html>

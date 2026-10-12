@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Class Gate · New HSK Course 1</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230e7a4f'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E汉%3C/text%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --brand:#0e7a4f; --brand-2:#14b87a; --ink:#1c1c22; --mut:#6b6b76; --bg:#f7f5f2; --card:#ffffff;
+      --line:#e6e2dc; --ok:#1a9e5c; --warn:#c07a1d; --bad:#c0392b;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{ --brand:#3ddc97; --brand-2:#14b87a; --ink:#f0eee9; --mut:#9a9aa4; --bg:#141419; --card:#1d1d25; --line:#2c2c36; }
+    }
+    *{box-sizing:border-box; margin:0; padding:0}
+    body{
+      font-family:Inter,'Noto Sans SC',system-ui,sans-serif; background:var(--bg); color:var(--ink);
+      min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    }
+    .card{
+      width:100%; max-width:420px; background:var(--card); border:1px solid var(--line);
+      border-radius:20px; padding:34px 30px; text-align:center;
+      box-shadow:0 18px 50px rgba(0,0,0,.10);
+    }
+    .seal{
+      width:64px; height:64px; margin:0 auto 14px; border-radius:16px; background:linear-gradient(135deg,var(--brand-2),var(--brand) 60%,#0a5c3c);
+      color:#fff; font-size:34px; font-weight:700; display:flex; align-items:center; justify-content:center;
+      font-family:'Noto Sans SC',sans-serif;
+    }
+    h1{font-size:22px; font-weight:800; letter-spacing:-.3px}
+    .sub{color:var(--mut); font-size:13.5px; margin:6px 0 22px}
+    .sub .hz{font-family:'Noto Sans SC',sans-serif}
+    label{display:block; text-align:left; font-size:12px; font-weight:700; color:var(--mut);
+      text-transform:uppercase; letter-spacing:.6px; margin:14px 0 6px}
+    input{
+      width:100%; padding:12px 14px; font-size:16px; border:1.5px solid var(--line); border-radius:12px;
+      background:var(--bg); color:var(--ink); outline:none; transition:border-color .15s;
+      font-family:inherit;
+    }
+    input:focus{border-color:var(--brand)}
+    input[code]{letter-spacing:6px; font-weight:700; text-align:center}
+    button{
+      width:100%; margin-top:22px; padding:13px; border:0; border-radius:12px; cursor:pointer;
+      background:linear-gradient(135deg,var(--brand-2),var(--brand) 65%,#0a5c3c); color:#fff; font-size:16px; font-weight:800; font-family:inherit;
+      transition:transform .12s, opacity .12s;
+    }
+    button:hover{transform:translateY(-1px)}
+    button:disabled{opacity:.55; cursor:wait; transform:none}
+    .msg{min-height:22px; margin-top:14px; font-size:13.5px; font-weight:600}
+    .msg.bad{color:var(--bad)} .msg.ok{color:var(--ok)}
+    .msg .ar{display:block; direction:rtl; font-weight:500; margin-top:2px}
+    .kick{
+      display:none; background:rgba(192,57,43,.10); border:1px solid rgba(192,57,43,.35);
+      color:var(--bad); border-radius:12px; padding:10px 12px; font-size:13.5px; margin-bottom:6px;
+      direction:rtl; text-align:right;
+    }
+    .offline{
+      display:none; background:rgba(26,158,92,.10); border:1px solid rgba(26,158,92,.35);
+      color:var(--ok); border-radius:12px; padding:10px 12px; font-size:13.5px; margin-bottom:6px;
+    }
+    .cont{display:none; margin-top:14px; font-size:13.5px; color:var(--mut)}
+    .cont a{color:var(--brand); font-weight:700; text-decoration:none}
+    footer{margin-top:18px; font-size:11.5px; color:var(--mut)}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="seal">汉</div>
+    <h1>Class Gate</h1>
+    <div class="sub">New HSK Course 1 · <span class="hz">班级入口</span> — enter your name &amp; class code</div>
+
+    <div class="kick" id="kickBox"></div>
+    <div class="offline" id="offlineBox">Offline copy — tracking disabled.<br>نسخة بلا اتصال — التتبع معطّل.</div>
+
+    <form id="gateForm" autocomplete="off">
+      <label for="nameIn">Your name · الاسم</label>
+      <input id="nameIn" list="rosterList" placeholder="As written on the class list" required>
+      <datalist id="rosterList"></datalist>
+
+      <label for="codeIn">Class code · الكود</label>
+      <input id="codeIn" inputmode="numeric" placeholder="••••" required>
+
+      <button id="goBtn" type="submit">进入 · Enter class</button>
+    </form>
+
+    <div class="msg" id="msg"></div>
+    <div class="cont" id="contBox"></div>
+    <footer>🔒 Codes stay in the teacher's sheet — only your name &amp; device label are logged.</footer>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/sheets.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var $ = function (id) { return document.getElementById(id); };
+      var params = new URLSearchParams(location.search);
+      var next = params.get('next') || 'index.html';
+      // never bounce back to the gate itself
+      if (/gate\.html/.test(next)) next = 'index.html';
+
+      /* kick / offline banners */
+      if (params.get('kick')) {
+        $('kickBox').style.display = 'block';
+        $('kickBox').textContent = params.get('msg') || 'تم إنهاء جلستك.';
+      }
+      if (!window.HSK1 || !HSK1.enabled()) {
+        $('offlineBox').style.display = 'block';
+        $('goBtn').textContent = 'Continue without tracking';
+      }
+
+      /* existing session → quick continue */
+      var s = window.HSK1 && HSK1.session();
+      if (s) {
+        $('contBox').style.display = 'block';
+        $('contBox').innerHTML = 'Still signed in as <b>' + s.student + '</b> — <a id="contLink" href="' + next + '">continue →</a> · <a id="outLink" href="#">switch</a>';
+        $('outLink').addEventListener('click', function (e) {
+          e.preventDefault(); HSK1.logout(); location.reload();
+        });
+      }
+
+      /* roster autocomplete (names only) */
+      if (HSK1.enabled()) {
+        HSK1.get({ action: 'roster' }).then(function (res) {
+          if (res && res.ok && res.students) {
+            var dl = $('rosterList');
+            res.students.forEach(function (st) {
+              var o = document.createElement('option'); o.value = st.name; dl.appendChild(o);
+            });
+          }
+        }).catch(function () {});
+      }
+
+      var ERR = {
+        empty_name:      ['Enter your name.', 'اكتب اسمك.'],
+        unknown_student: ['Name not on the class list.', 'الاسم غير موجود في قائمة الصف.'],
+        bad_code:        ['Wrong code — check with your teacher.', 'كود خاطئ — راجع معلمك.'],
+        inactive:        ['This account is paused by the teacher.', 'هذا الحساب موقوف مؤقتاً من المعلم.'],
+        no_code_set:     ['No code configured for this name.', 'لم يُضبط كود لهذا الاسم.'],
+        offline:         ['Tracking service unreachable.', 'تعذر الوصول لخدمة التتبع.']
+      };
+
+      $('gateForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var name = $('nameIn').value.trim();
+        var code = $('codeIn').value.trim();
+        var msg = $('msg');
+        msg.className = 'msg'; msg.textContent = '';
+
+        if (!HSK1.enabled()) {           // offline bundle: open door, no tracking
+          HSK1.setSession({ student: name, at: Date.now(), checkedAt: Date.now(), deviceId: 'offline' });
+          location.replace(next);
+          return;
+        }
+
+        var btn = $('goBtn');
+        btn.disabled = true; btn.textContent = 'Checking…';
+        HSK1.login(name, code).then(function (res) {
+          btn.disabled = false; btn.textContent = '进入 · Enter class';
+          if (res && res.ok) {
+            msg.className = 'msg ok';
+            msg.innerHTML = 'Welcome, ' + res.student + ' … <span class="ar">أهلاً بك — جارٍ الدخول</span>';
+            setTimeout(function () { location.replace(next); }, 350);
+          } else {
+            var t = ERR[(res && res.error) || 'offline'] || ['Login failed.', 'تعذر الدخول.'];
+            msg.className = 'msg bad';
+            msg.innerHTML = t[0] + ' <span class="ar">' + t[1] + '</span>';
+          }
+        }).catch(function () {
+          btn.disabled = false; btn.textContent = '进入 · Enter class';
+          msg.className = 'msg bad';
+          msg.innerHTML = ERR.offline[0] + ' <span class="ar">' + ERR.offline[1] + '</span>';
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

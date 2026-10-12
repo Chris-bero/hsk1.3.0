@@ -1,0 +1,7 @@
+# Netlify headers — long cache for stable assets (900 audio clips never change)
+/audio/*
+  Cache-Control: public, max-age=31536000, immutable
+/js/vendor/*
+  Cache-Control: public, max-age=31536000, immutable
+/js/data/*
+  Cache-Control: public, max-age=86400

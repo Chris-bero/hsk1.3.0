@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>New HSK Course 1 · Lesson</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230e7a4f'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E汉%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Reading progress -->
+  <div id="scrollProgress"></div>
+
+  <!-- Floating background characters -->
+  <div id="bgDeco" aria-hidden="true">
+    <span style="--x:4%;  --y:10%; --s:230px; --dur:26s">汉</span>
+    <span style="--x:84%; --y:6%;  --s:290px; --dur:33s">语</span>
+    <span style="--x:72%; --y:42%; --s:200px; --dur:29s">学</span>
+    <span style="--x:8%;  --y:52%; --s:250px; --dur:36s">习</span>
+    <span style="--x:88%; --y:74%; --s:220px; --dur:24s">你</span>
+    <span style="--x:22%; --y:84%; --s:260px; --dur:31s">好</span>
+    <span style="--x:52%; --y:22%; --s:180px; --dur:28s">中</span>
+  </div>
+
+  <!-- ===== Nav ===== -->
+  <nav id="nav">
+    <div class="nav-inner">
+      <a class="brand" href="#hero">
+        <div class="brand-seal">汉</div>
+        <div class="brand-text" id="navBrandText">
+          <b>New HSK Course 1</b>
+          <span>Loading lesson…</span>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="#words">📖 Words</a>
+        <a href="#grammar">📐 Grammar</a>
+        <a href="#dialogue">💬 Dialogue</a>
+        <a href="#practice">🎯 Practice</a>
+      </div>
+      <div class="nav-controls">
+        <a class="tgl" href="index.html" title="All lessons" style="text-decoration:none">🏠</a>
+        <div class="speed-ctl" id="speedCtl" title="Playback speed for ALL audio">
+          <span class="sp-label">🐢</span>
+          <button data-speed="0.5">0.5×</button>
+          <button data-speed="0.75">0.75×</button>
+          <button data-speed="1" class="on">1×</button>
+          <button data-speed="1.25">1.25×</button>
+        </div>
+        <button class="tgl on" id="pyToggle" aria-pressed="true" title="Show / hide pinyin everywhere"><span class="dot"></span>Pīnyīn</button>
+        <button class="tgl on" id="enToggle" aria-pressed="true" title="Show / hide English everywhere"><span class="dot"></span>English</button>
+        <button class="tgl" id="darkBtn" title="Dark / light mode">🌙</button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Lesson-not-built notice (shown by loader.js if data file is missing) -->
+    <div class="load-error card" id="loadError" style="display:none">
+      <h2>🔒 <span id="loadErrorMsg">This lesson is not built yet.</span></h2>
+      <p>The data file for this lesson doesn't exist yet — it's coming soon. Pick a ready lesson from the course hub.</p>
+      <a class="btn btn-primary" href="index.html">← Back to all lessons</a>
+    </div>
+
+    <!-- ===== Hero ===== -->
+    <header id="hero"></header>
+
+    <!-- ===== Words ===== -->
+    <section id="words">
+      <div class="sec-head reveal">
+        <div class="sec-badge hz">词</div>
+        <div>
+          <h2>New Words · 生词</h2>
+          <div class="sub"><span id="wordsSectionCount"></span> new words — tap ▶ to hear each word and its example sentence</div>
+        </div>
+      </div>
+      <div class="toolbar" id="wordsToolbar">
+        <button class="pill active" data-filter="all">All words</button>
+        <button class="pill" data-filter="key">⭐ Key words</button>
+        <span class="spacer"></span>
+        <span class="count-note" id="wordCount"></span>
+        <button class="btn btn-ghost btn-sm" id="playAllBtn">▶ Play all words</button>
+      </div>
+      <div class="word-grid" id="wordGrid"></div>
+    </section>
+
+    <!-- ===== Grammar ===== -->
+    <section id="grammar">
+      <div class="sec-head reveal">
+        <div class="sec-badge hz">文</div>
+        <div>
+          <h2>Grammar · 语言点</h2>
+          <div class="sub">Language points, short and clear — with examples from the lesson</div>
+        </div>
+      </div>
+      <div class="grammar-list" id="grammarList"></div>
+      <div class="bonus-grid" id="bonusGrid"></div>
+    </section>
+
+    <!-- ===== Dialogue ===== -->
+    <section id="dialogue">
+      <div class="sec-head reveal">
+        <div class="sec-badge hz">话</div>
+        <div>
+          <h2>Dialogues · 课文</h2>
+          <div class="sub">Play line by line or the full dialogue · adjust the speed in the top bar · try listening mode</div>
+        </div>
+      </div>
+      <div class="dlg-tabs" id="dlgTabs"></div>
+      <div class="dlg-panel card reveal" id="dlgPanel"></div>
+    </section>
+
+    <!-- ===== Practice ===== -->
+    <section id="practice">
+      <div class="sec-head reveal">
+        <div class="sec-badge hz">练</div>
+        <div>
+          <h2>Practice · 练习</h2>
+          <div class="sub">Flashcards, the memory drill from the classroom slides, and a full quiz</div>
+        </div>
+      </div>
+      <div class="stats-strip" id="statsStrip"></div>
+      <div class="practice-tabs" id="practiceTabs"></div>
+      <div class="practice-panel card reveal" id="practiceBody"></div>
+    </section>
+
+    <!-- Prev / Next lesson -->
+    <nav class="lnav" id="lessonNav" aria-label="Lesson navigation"></nav>
+  </main>
+
+  <footer>
+    <div class="hz">加油！</div>
+    Digitized from <b>New HSK Course 1</b> · Studio audio with browser-speech fallback · Progress saved in your browser
+  </footer>
+
+  <!-- Back to top -->
+  <button id="toTop" title="Back to top">↑</button>
+  <!-- Stroke-order modal -->
+  <div class="modal hidden" id="strokeModal"></div>
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/sheets.js"></script>
+  <script>window.HSK1 && HSK1.requireSession();</script>
+  <script src="js/loader.js"></script>
+  <script>
+    /* ============================================================
+       study-activity telemetry (v2 rebuild · HSK 1 accuracy upgrade)
+       ------------------------------------------------------------
+       Counts VISIBLE study time only: a lesson left open in a hidden
+       tab no longer inflates the minutes. Seconds are accumulated and
+       reported in one lesson_time event as soon as 60 s of real study
+       time is banked (backend sums Log!Seconds per student per lesson).
+       ============================================================ */
+    if (window.HSK1 && HSK1.enabled()) {
+      var LID = window.__LESSON_ID__ || '';
+      HSK1.log('lesson_open', 'lesson ' + LID);
+
+      var banked = 0;                 /* visible seconds not yet reported */
+      var last = Date.now();
+      var TICK = 15000;               /* accounting tick */
+      var REPORT_AT = 60;             /* report once this much is banked */
+
+      function bank() {
+        var now = Date.now();
+        if (!document.hidden) banked += (now - last) / 1000;
+        last = now;
+      }
+      function masteryPulse() {
+        if (!(window.LESSON && window.LESSON.words)) return;
+        try {
+          var mj = JSON.parse(localStorage.getItem('hsk1-l' + LID + ':mastered') || '{}');
+          var mc = 0; for (var k in mj) if (mj[k]) mc++;
+          HSK1.log('mastery', '', { score: mc, total: window.LESSON.words.length });
+        } catch (e) {}
+      }
+      function report(force) {
+        bank();
+        if (banked >= REPORT_AT || (force && banked >= 5)) {
+          HSK1.log('lesson_time', '', { seconds: Math.round(banked) });
+          banked = 0;
+          masteryPulse();
+        }
+      }
+      setInterval(function () { report(false); }, TICK);
+
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { report(true); HSK1.flush(); }  /* bank + push before we lose the tab */
+        else { last = Date.now(); }                           /* hidden time is not counted */
+      });
+      window.addEventListener('pagehide', function () { report(true); HSK1.flush(); });
+    }
+  </script>
+</body>
+</html>

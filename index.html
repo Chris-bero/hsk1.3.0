@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>New HSK Course 1 · Interactive Lessons</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230e7a4f'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E汉%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Reading progress -->
+  <div id="scrollProgress"></div>
+
+  <!-- Floating background characters -->
+  <div id="bgDeco" aria-hidden="true">
+    <span style="--x:5%;  --y:8%;  --s:240px; --dur:27s">标</span>
+    <span style="--x:82%; --y:10%; --s:280px; --dur:34s">准</span>
+    <span style="--x:70%; --y:46%; --s:210px; --dur:30s">教</span>
+    <span style="--x:9%;  --y:50%; --s:250px; --dur:37s">程</span>
+    <span style="--x:86%; --y:76%; --s:230px; --dur:25s">汉</span>
+    <span style="--x:24%; --y:82%; --s:260px; --dur:32s">语</span>
+  </div>
+
+  <!-- ===== Nav ===== -->
+  <nav id="nav">
+    <div class="nav-inner">
+      <a class="brand" href="#hero">
+        <div class="brand-seal">汉</div>
+        <div class="brand-text">
+          <b>New HSK Course 1</b>
+          <span>Interactive digital edition</span>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="#lessons">📚 Lessons</a>
+        <a href="#howto">✨ How it works</a>
+      </div>
+      <div class="nav-controls">
+        <button class="tgl on" id="pyToggle" aria-pressed="true" title="Show / hide pinyin"><span class="dot"></span>Pīnyīn</button>
+        <button class="tgl" id="darkBtn" title="Dark / light mode">🌙</button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- ===== Hero ===== -->
+    <header id="hero">
+      <div class="hero-seal" aria-hidden="true"><div><span>一</span><small>HSK 1</small></div></div>
+      <div class="hero-kicker">📕 汉语 · Interactive digital course</div>
+      <h1 class="hero-title hz grad-text">新HSK教程 1</h1>
+      <div class="hero-py py">New HSK Course 1 — digitized</div>
+      <div class="hero-en">15 lessons · words with audio · grammar · dialogues · games &amp; quizzes</div>
+      <div class="hero-stats" id="hubStats"></div>
+      <div class="hero-ctas" id="hubCtas"></div>
+    </header>
+
+    <!-- ===== Lessons ===== -->
+    <section id="lessons">
+      <div class="sec-head reveal">
+        <div class="sec-badge hz">课</div>
+        <div>
+          <h2>All Lessons · 课文目录</h2>
+          <div class="sub">Open a ready lesson to study — locked ones are being built, one by one</div>
+        </div>
+      </div>
+      <div class="lesson-grid" id="lessonGrid"></div>
+    </section>
+
+    <!-- ===== How it works ===== -->
+    <section id="howto">
+      <div class="sec-head reveal">
+        <div class="sec-badge gold hz">法</div>
+        <div>
+          <h2>How each lesson works</h2>
+          <div class="sub">The same template you know from Lesson 7 — for every lesson</div>
+        </div>
+      </div>
+      <div class="howto-grid">
+        <div class="card howto reveal" style="--d:0ms">
+          <div class="howto-icon">📖</div>
+          <h3>1 · Words 生词</h3>
+          <p>Every new word as a card: character, pinyin, meaning and an example sentence — each with studio audio, stroke-order animation and a global speed control 🐢.</p>
+        </div>
+        <div class="card howto reveal" style="--d:80ms">
+          <div class="howto-icon">📐</div>
+          <h3>2 · Grammar 语言点</h3>
+          <p>Each language point with its pattern, a short explanation, highlighted examples you can listen to, and the lesson's character &amp; pronunciation corners.</p>
+        </div>
+        <div class="card howto reveal" style="--d:160ms">
+          <div class="howto-icon">💬</div>
+          <h3>3 · Dialogues 课文</h3>
+          <p>The lesson dialogues as chat bubbles — line by line or full playback, adjustable speed, a listening challenge mode with blurred text, and textbook questions.</p>
+        </div>
+        <div class="card howto reveal" style="--d:240ms">
+          <div class="howto-icon">🎯</div>
+          <h3>4 · Practice 练习</h3>
+          <p>Flashcards with mastery tracking, the “which word disappeared?” memory drill, and a 10-question quiz — your progress is saved automatically.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="hz">学汉语 · 每天进步</div>
+    Digitized from <b>New HSK Course 1</b> (FLTRP · 外语教学与研究出版社) · Built as an interactive study companion
+  </footer>
+
+  <!-- Back to top -->
+  <button id="toTop" title="Back to top">↑</button>
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/sheets.js"></script>
+  <script>window.HSK1 && HSK1.requireSession();</script>
+  <script src="js/course.js"></script>
+  <script src="js/hub.js"></script>
+</body>
+</html>
